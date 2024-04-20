@@ -5,15 +5,10 @@ services:
       context: .
     restart: always
     container_name: pig-ui
-    image: pig-ui
-    networks:
-      - spring_cloud_default
-    external_links:
-      - pig-gateway
+    image: pauly.fun:8009/pig-ui
     ports:
-      - 80:80
-
-# 加入到后端网络， 默认为 spring_cloud_default  | docker network ls   查看
-networks:
-  spring_cloud_default:
-    external: true
+      - 8005:80
+    volumes:
+      - /root/nginx/certs:/etc/nginx/certs
+    extra_hosts:
+      - "pig-gateway:192.168.0.110"
