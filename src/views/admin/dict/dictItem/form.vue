@@ -1,6 +1,6 @@
 <template>
   <div class="system-dic-dialog-container">
-    <el-dialog v-model="visible" destroy-on-close :title="dataForm.id ? $t('common.editBtn') : $t('common.addBtn')" width="600">
+    <el-dialog v-model="visible" :title="dataForm.id ? $t('common.editBtn') : $t('common.addBtn')" width="600">
       <el-form ref="dicDialogFormRef" :model="dataForm" label-width="90px" :rules="dataRules" v-loading="loading">
         <el-form-item :label="$t('dictItem.dictType')" prop="dictType">
           <el-input v-model="dataForm.dictType" clearable disabled
@@ -41,7 +41,7 @@
 import {useI18n} from 'vue-i18n';
 import {getItemObj, addItemObj, putItemObj, validateDictItemLabel} from '/@/api/admin/dict';
 import {useMessage} from '/@/hooks/message';
-
+import {rule} from '/@/utils/validate';
 // 定义子组件向父组件传值/事件
 const emit = defineEmits(['refresh']);
 const {t} = useI18n();
@@ -64,8 +64,9 @@ const dataForm = reactive({
 });
 
 const dataRules = reactive({
-  value: [{required: true, message: '数据值不能为空', trigger: 'blur'}],
+  value: [{validator: rule.overLength, trigger: 'blur'},{required: true, message: '数据值不能为空', trigger: 'blur'}],
   label: [
+    {validator: rule.overLength, trigger: 'blur'},
     {required: true, message: '标签不能为空', trigger: 'blur'},
     {
       validator: (rule: any, value: any, callback: any) => {
@@ -74,8 +75,8 @@ const dataRules = reactive({
       trigger: 'blur',
     },
   ],
-  description: [{required: true, message: '描述不能为空', trigger: 'blur'}],
-  sortOrder: [{required: true, message: '排序不能为空', trigger: 'blur'}],
+  description: [{validator: rule.overLength, trigger: 'blur'},{required: true, message: '描述不能为空', trigger: 'blur'}],
+  sortOrder: [{validator: rule.overLength, trigger: 'blur'},{required: true, message: '排序不能为空', trigger: 'blur'}],
 });
 
 // 打开弹窗
@@ -85,15 +86,15 @@ const openDialog = (row: any, dictForm: any) => {
 
   nextTick(() => {
     dicDialogFormRef.value?.resetFields();
+    if (dictForm) {
+      dataForm.dictId = dictForm.dictId;
+      dataForm.dictType = dictForm.dictType;
+    }
   });
-
   if (row?.id) {
     getItemObj(row.id).then((res) => {
       Object.assign(dataForm, res.data);
     });
-  } else if (dictForm) {
-    dataForm.dictId = dictForm.dictId;
-    dataForm.dictType = dictForm.dictType;
   }
 };
 

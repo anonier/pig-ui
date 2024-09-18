@@ -14,9 +14,13 @@ yarn-error.log*
 pnpm-debug.log*
 
 # Editor directories and files
+!.idea/icon.png
 .idea
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# lock files
+yarn.lock
